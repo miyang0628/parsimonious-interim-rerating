@@ -1,0 +1,116 @@
+{
+  "C5_leakage_free": {
+    "note": "Bucket edges from TRAIN fold only; grade, signal, and M0/M1 all fit in-fold (fully nested OOF).",
+    "AUC_M0": 0.7358,
+    "AUC_M1": 0.7384,
+    "AR_M0": 0.4717,
+    "AR_M1": 0.4769,
+    "DeLong_z": 3.16,
+    "DeLong_p": "1.60e-03",
+    "Brier_M0": 0.04377,
+    "Brier_M1": 0.04359
+  },
+  "C2_economic_significance": {
+    "IDI": 0.00421,
+    "NRI_continuous": -0.0635,
+    "Brier_skill_score": 0.0042,
+    "IDI_mid_band": 0.00059,
+    "NRI_mid_band": 0.2133,
+    "decision_value": {
+      "cost_ratio_5": {
+        "min_cost_M0": 9810,
+        "min_cost_M1": 9766,
+        "reduction_pct": 0.45
+      },
+      "cost_ratio_10": {
+        "min_cost_M0": 17198,
+        "min_cost_M1": 17252,
+        "reduction_pct": -0.31
+      },
+      "cost_ratio_20": {
+        "min_cost_M0": 26665,
+        "min_cost_M1": 26401,
+        "reduction_pct": 0.99
+      }
+    }
+  },
+  "C10_asymmetry_test": {
+    "coef_det": 2.757,
+    "z_det": 7.53,
+    "coef_imp": 1.187,
+    "z_imp": 1.45,
+    "n_deterioration": 20628,
+    "n_improvement": 22777,
+    "Wald_det_plus_imp_eq_0_stat": 5.03,
+    "Wald_p": "4.98e-07"
+  },
+  "C7_imbalance_robustness": [
+    {
+      "treatment": "none",
+      "AUC_M1": 0.671,
+      "AR_M1": 0.342
+    },
+    {
+      "treatment": "balanced",
+      "AUC_M1": 0.74,
+      "AR_M1": 0.4799
+    },
+    {
+      "treatment": "oversample",
+      "AUC_M1": 0.7425,
+      "AR_M1": 0.485
+    }
+  ],
+  "C6_all_pairs": {
+    "note": "Incremental LR of adding each 2-ratio signal over a fixed full-model grade; 12 curated ratios, 66 pairs.",
+    "n_pairs": 66,
+    "levprof_pairs_mean_LR": 51.0,
+    "levprof_best_rank": 1,
+    "levprof_worst_rank": 35,
+    "overall_median_LR": 15.3,
+    "top5": [
+      {
+        "a": "Attr2",
+        "b": "Attr18",
+        "pair_type": "leverage+profitability",
+        "incremental_LR": 80.4
+      },
+      {
+        "a": "Attr2",
+        "b": "Attr7",
+        "pair_type": "leverage+profitability",
+        "incremental_LR": 80.4
+      },
+      {
+        "a": "Attr2",
+        "b": "Attr1",
+        "pair_type": "leverage+profitability",
+        "incremental_LR": 75.6
+      },
+      {
+        "a": "Attr2",
+        "b": "Attr17",
+        "pair_type": "leverage+leverage",
+        "incremental_LR": 75.4
+      },
+      {
+        "a": "Attr2",
+        "b": "Attr36",
+        "pair_type": "activity+leverage",
+        "incremental_LR": 75.0
+      }
+    ],
+    "by_type_mean": {
+      "leverage+leverage": 57.3,
+      "leverage+profitability": 51.0,
+      "activity+leverage": 33.1,
+      "leverage+liquidity": 31.4,
+      "activity+profitability": 17.0,
+      "profitability+profitability": 16.8,
+      "liquidity+profitability": 15.2,
+      "activity+activity": 4.1,
+      "liquidity+liquidity": 3.5,
+      "activity+liquidity": 2.8
+    }
+  }
+}

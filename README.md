@@ -21,8 +21,9 @@ cheap PIT overlay adds default-relevant information beyond the TTC grade, and fo
 | Outcome | bankruptcy label | letter grade (AAA…CCC) |
 
 The two studies use different data with complementary strengths (one has a default outcome but no
-ratings; the other has ratings but no default outcome), so together they form an internal / external
-validity pair.
+ratings; the other has ratings but no default outcome). They share no firms and differ in country,
+period, and outcome, so they provide complementary, corroborating evidence rather than two estimates
+of one quantity.
 
 ## Hypotheses
 
@@ -48,7 +49,9 @@ parsimonious-interim-rerating/
 │   ├── 01_eda.ipynb           # distributions, missingness, band structure, signal checks
 │   ├── 02_study1_polish.ipynb # H1–H4 + pseudo-time gradient (incremental default prediction)
 │   ├── 03_study2_ratings.ipynb# rating recovery, ordered-logit inference, migration matrix
-│   └── 04_robustness.ipynb    # bucket sensitivity, regularized ordinal, indicator-choice swap
+│   ├── 04_robustness.ipynb    # bucket sensitivity, regularized ordinal, indicator-choice swap
+│   └── 05_additional_experiments.ipynb # leakage-free re-estimation, economic significance,
+│                               # all-pairs indicator distribution, asymmetry/imbalance, QWK CIs
 └── results/
     ├── figures/               # png + pdf, grayscale, 600 dpi
     └── tables/                # csv
@@ -61,7 +64,7 @@ parsimonious-interim-rerating/
    pip install -r requirements.txt
    ```
 2. Obtain the two public datasets and place them as described in [`data/README.md`](data/README.md).
-3. Run the notebooks in order (`01` → `04`). Each notebook is a **single self-contained cell**; run it
+3. Run the notebooks in order (`01` → `05`). Each notebook is a **single self-contained cell**; run it
    top-to-bottom. From the command line:
    ```
    cd notebooks
@@ -87,6 +90,11 @@ All figures are grayscale, 600 dpi, exported in both PNG and PDF, with **no capt
   effects is estimated with an **L2-penalized proportional-odds** model (hand-rolled) to ensure
   convergence; conclusions are unchanged across estimators.
 - "Mid band" = BBB/BB/B (and the quantile-grade analog in Study 1); "extremes" = the rest.
+- `05_additional_experiments.ipynb` adds supplementary analyses supporting the manuscript: a
+  leakage-free nested re-estimation (grade bucket edges from training folds only), economic-significance
+  metrics (IDI, net reclassification, decision-value cost reduction), an all-pairs indicator analysis
+  (66 pairs across four ratio categories), a formal Wald test of the H3 asymmetry, class-imbalance
+  robustness, and bootstrap confidence intervals for the rating-recovery kappa.
 
 ## License
 

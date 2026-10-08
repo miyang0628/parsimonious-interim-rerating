@@ -1,0 +1,36 @@
+{
+  "C8_rf": {
+    "hyperparameters": {
+      "n_estimators": 300,
+      "max_depth": null,
+      "min_samples_leaf": 1,
+      "max_features": "sqrt",
+      "random_state": 0,
+      "n_jobs": -1
+    },
+    "QWK_full": 0.654,
+    "QWK_full_CI95": [
+      0.6253,
+      0.6799
+    ],
+    "QWK_2proxy": 0.345,
+    "QWK_2proxy_CI95": [
+      0.3028,
+      0.3839
+    ],
+    "CIs_disjoint": true
+  },
+  "C9_po_validation": {
+    "note": "Hand-rolled L2 proportional-odds (lambda=1e-4) vs statsmodels OrderedModel, 2-proxy case.",
+    "statsmodels_beta": {
+      "debtRatio": 0.4733,
+      "returnOnAssets": -0.6122
+    },
+    "handrolled_beta": {
+      "debtRatio": 0.4734,
+      "returnOnAssets": -0.6121
+    },
+    "max_abs_diff": 0.0001,
+    "sign_and_order_agree": true
+  }
+}

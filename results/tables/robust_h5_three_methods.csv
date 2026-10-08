@@ -1,0 +1,7 @@
+method,band,loss_pp
+Random forest,mid,11.6
+Random forest,extreme,18.4
+Ordered logit,mid,4.1
+Ordered logit,extreme,8.7
+Regularized ordinal (PO),mid,4.2
+Regularized ordinal (PO),extreme,8.3
