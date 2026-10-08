@@ -1,3 +1,0 @@
-model,QWK,accuracy,within1
-Full 25 features,0.654,0.5091,0.9088
-"2 proxies (debtRatio, ROA)",0.345,0.3149,0.7703
