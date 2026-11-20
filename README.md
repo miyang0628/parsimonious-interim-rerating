@@ -29,11 +29,17 @@ of one quantity.
 
 - **H1 / H2** — a 2-indicator signal adds statistically significant default information beyond a base
   grade built from the *other* features (incremental AUC; DeLong and likelihood-ratio tests).
-- **H3** — the incremental information is **asymmetric**: deterioration predicts default more strongly
-  than improvement protects against it.
+- **H3** — the incremental information may be **asymmetric** (deterioration more informative than
+  improvement). *Revised status:* under the correct equal-slopes contrast this is **not** statistically
+  established and is reported as suggestive only (see [Review-round additions](#review-round-additions)).
 - **H4** — the incremental value is **largest in the middle band** (B/BB analog) and small at the extremes.
 - **H5** — in rating recovery, the information lost by using only two indicators is **larger at the
   extremes** than in the middle, which makes excluding the extremes from interim re-rating defensible.
+
+> **What the final manuscript claims.** The central result is sharpened to **identity, not count**:
+> *which* two indicators are used — their informativeness — is the first-order source of specification
+> risk, while a permutation test finds the broad accounting category (solvency vs liquidity/activity)
+> does **not** predict a pair's rank. See the review-round section below.
 
 ## Repository structure
 
@@ -42,19 +48,38 @@ parsimonious-interim-rerating/
 ├── README.md
 ├── requirements.txt
 ├── data/
-│   ├── README.md              # data provenance + download instructions (raw data not redistributed)
-│   ├── polish/                # place 1year.arff … 5year.arff here
-│   └── corporate_rating.csv   # place the labeled corporate-rating CSV here
-├── notebooks/
-│   ├── 01_eda.ipynb           # distributions, missingness, band structure, signal checks
-│   ├── 02_study1_polish.ipynb # H1–H4 + pseudo-time gradient (incremental default prediction)
-│   ├── 03_study2_ratings.ipynb# rating recovery, ordered-logit inference, migration matrix
-│   ├── 04_robustness.ipynb    # bucket sensitivity, regularized ordinal, indicator-choice swap
-│   └── 05_additional_experiments.ipynb # leakage-free re-estimation, economic significance,
-│                               # all-pairs indicator distribution, asymmetry/imbalance, QWK CIs
+│   ├── README.md              # data provenance + licenses
+│   ├── polish/                # 1year.arff … 5year.arff (Polish bankruptcy, Study 1)
+│   ├── corporate_rating.csv   # labeled corporate-rating CSV (Study 2)
+│   └── external/              # firm-independent cross-sections for the replication check
+│       ├── credit_risk_dataset.csv
+│       ├── gmsc_raw.parquet
+│       ├── taiwan_raw.parquet
+│       └── adult_raw.parquet  # non-credit control
+├── notebooks/                 # original analysis (run in order 01 → 05)
+│   ├── 01_eda.ipynb
+│   ├── 02_study1_polish.ipynb
+│   ├── 03_study2_ratings.ipynb
+│   ├── 04_robustness.ipynb
+│   └── 05_additional_experiments.ipynb
+├── analysis_review/           # review-round (rebuttal) scripts — added after peer review
+│   ├── multi_dataset_robustness.py   # identity-vs-count across 5 datasets; DeLong; placebo
+│   ├── h3_asymmetry_robustness.py    # H3 under the CORRECT equal-slopes null (fixed)
+│   └── referee_round2_extra.py       # continuous base PD; 66-pair FDR; Study 2 band bootstrap CI
+├── run_review_analyses.sh     # one command to reproduce all review-round results from shipped data
+├── manuscript/                # final submitted LaTeX source + compiled PDF
+│   ├── main.tex
+│   ├── references.bib
+│   └── main.pdf
 └── results/
     ├── figures/               # png + pdf, grayscale, 600 dpi
-    └── tables/                # csv
+    ├── tables/                # csv
+    └── review/                # review-round JSON outputs (written by run_review_analyses.sh)
+        ├── multidata_results.json
+        ├── round2_extra.json
+        ├── h3_robustness.json
+        ├── h3_correct_null.json      # corrected asymmetry test (p = 0.109, not significant)
+        └── category_permutation.json # solvency vs liquidity/activity (p = 0.80)
 ```
 
 ## Reproduce
@@ -73,6 +98,44 @@ parsimonious-interim-rerating/
    Outputs are written to `results/figures/` (png + pdf, grayscale, 600 dpi) and `results/tables/` (csv).
 
 Random seeds are fixed (`random_state=0`, 5-fold stratified CV), so results are deterministic.
+
+### Review-round analyses
+
+The rebuttal analyses run directly from the datasets shipped in this repository — no manual paths
+needed:
+
+```
+bash run_review_analyses.sh
+```
+
+This writes `results/review/*.json`. The three scripts can also be run individually; each one's argument
+order is documented in its header docstring. (`POL` defaults to `data/polish`; override with
+`POL=/path/to/polish` if your Polish files live elsewhere.)
+
+## Review-round additions
+
+These were added after peer review and are the basis for the final manuscript's sharpened claims.
+
+- **External replication across firm-independent cross-sections** (`multi_dataset_robustness.py`). The
+  Polish panel pools repeated-firm observations with no firm identifier, so the increment could in
+  principle be a clustering artifact. Re-running the identity-vs-count test on four row-independent
+  datasets (a consumer-loan set, "Give Me Some Credit", a Taiwan card set, and a non-credit Adult
+  control) shows the informative pair keeps adding discrimination while random "placebo" pairs do not —
+  the pattern is not a pooling artifact.
+- **Correct asymmetry test** (`h3_asymmetry_robustness.py`, `results/review/h3_correct_null.json`). An
+  earlier version tested the Wald null `γ⁺ + γ⁻ = 0`, which merely restates "the signal predicts on
+  average" and is **not** a test of asymmetry. The correct equal-slopes contrast `γ⁺ − γ⁻ = 0` is **not
+  rejected** (*p* = 0.109); the downside slope partly reflects the larger dispersion of `d⁺`
+  (SD 0.052 vs 0.031). The manuscript now reports the downside pattern as suggestive only. The wrong
+  contrast is kept in the code as a commented line so the correction is transparent.
+- **Informativeness, not category** (`results/review/category_permutation.json`). A permutation test on
+  the broad accounting labels does **not** find the solvency category to outrank liquidity/activity
+  (diff = −2.8, *p* = 0.80); the top pairs are driven by one high-information working-capital ratio
+  (Attr3), and a pure-leverage pair ranks near the bottom. The headline is therefore "identity
+  (informativeness), not count", not "solvency beats liquidity".
+- **Multiple-testing control and continuous-base-PD benchmark** (`referee_round2_extra.py`). The 66-pair
+  ordering survives Bonferroni and Benjamini–Hochberg FDR; the pooled increment is not robust to a
+  continuous (non-discretized) base PD, which the manuscript states plainly.
 
 ## Figures
 

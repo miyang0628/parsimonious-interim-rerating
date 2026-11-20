@@ -1,0 +1,1091 @@
+%% Springer Nature LaTeX template (sn-jnl) — single-file submission.
+%% Prepared for: Empirical Economics (Springer).
+%% Reference style: author-year (sn-mathphys-ay) via natbib (\citet/\citep).
+%% Single-blind submission: author identities included on the title page.
+
+\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}
+
+%%%% Standard packages
+\usepackage[T1]{fontenc}% needed for accented names (e.g. Zi\k{e}ba) in the bibliography
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+
+\raggedbottom
+
+\begin{document}
+
+\title[Identity, Not Count: Model Risk in Parsimonious Credit Overlays]{Identity, Not Count: Indicator Selection as the First-Order Model Risk in Radically Reduced Credit Overlays}
+
+%%=============================================================%%
+%% Single-blind submission: author identities included.
+%%=============================================================%%
+
+\author[1]{\fnm{Subin} \sur{Ji}}\email{subinji33@ecredible.co.kr}
+
+\author[2]{\fnm{Hyunjeong} \sur{Kang}}\email{hyunjkang@kookmin.ac.kr}
+
+\author*[3]{\fnm{Munil} \sur{Yang}}\email{miyang@ips.or.kr}
+
+\affil[1]{\orgname{ECREDIBLE Co., Ltd.}, \orgaddress{\city{Seoul}, \country{Republic of Korea}}.
+ORCID: \url{https://orcid.org/0009-0003-8904-6346}}
+
+\affil[2]{\orgname{Kookmin University}, \orgaddress{\city{Seoul}, \country{Republic of Korea}}.
+ORCID: \url{https://orcid.org/0009-0007-9181-4649}}
+
+\affil[3]{\orgname{Institute for Industrial Policy Studies}, \orgaddress{\city{Seoul}, \country{Republic of Korea}}.
+ORCID: \url{https://orcid.org/0009-0004-1493-6691}}
+
+%%==================================%%
+%% Abstract (unstructured; no citations/equations per SN guidance)       %%
+%%==================================%%
+\abstract{How much of the specification risk in a reduced credit model comes from how \emph{many}
+indicators it uses, and how much from \emph{which}? We study a parsimonious overlay---two financial
+indicators laid over a grade built from the full ratio set---on public data with a reproducible,
+out-of-fold design, and show its value is governed by which indicators enter, not by the fact that there
+are two. Across 66 indicator pairs the incremental likelihood ratio spans two orders of
+magnitude: informative pairs dominate while uninformative ones are indistinguishable from zero, and the
+ordering survives Bonferroni and false-discovery control, though every pair adds exactly two regressors.
+The operative property is informativeness, not a textbook category: a permutation test does not find the
+solvency category to outrank the liquidity/activity category. The identity-over-count pattern replicates
+across a bankruptcy panel, a rating cross-section, and four independent consumer-credit datasets. By contrast the overlay's incremental
+\emph{ranking} power is modest and fragile---significant on the pooled panel but only near default by
+horizon, and not robust to a continuous base probability of default---so we claim no uniform
+discrimination gain. A rating-recovery analysis shows two indicators are least adequate at the rating
+extremes and most adequate in the middle band (bootstrap $95\%$ CI excludes zero); a downside-asymmetry
+pattern appears in the point estimates but is not established under the correct contrast, so we report it
+only as suggestive. The contribution is a reproducible demonstration that, in a reduced-form overlay,
+indicator selection is the first-order source of specification risk.}
+
+\keywords{Credit risk, Default prediction, Model risk, Feature selection, Specification risk, Reproducibility}
+
+\pacs[JEL Classification]{C52, C53, G21, G24, G28, G32}
+
+\maketitle
+
+%%=====================================================%%
+\section{Introduction}\label{sec:intro}
+
+When a credit model is radically reduced---refreshed between full reviews using only a handful of
+cheap indicators---where does its specification risk come from: from how \emph{many} indicators it uses,
+or from \emph{which}? This is the question we study, through a deliberately parsimonious overlay of two
+financial indicators laid over a grade built from the full ratio set. The credit-scoring literature has
+long treated the choice and number of predictors as a first-order design problem rather than a detail
+\citep{lessmann2015benchmarking,dumitrescu2022machine}, and a feature-selection literature shows that a
+small, well-chosen set can preserve most of a model's accuracy. We push that logic to its extreme---two
+indicators---and ask, within the tightest possible reduction, whether it is the count or the identity of
+the indicators that governs how much information the overlay carries. Our answer is that identity
+dominates: two indicators that carry solvency information behave entirely differently from two that do
+not, even though both add exactly two regressors, and this distinction---not the number two---is what a
+validation process for a reduced overlay should scrutinize. We test this with out-of-fold statistics on
+fully public data and corroborate it across a bankruptcy panel, a rating cross-section, and four
+independent consumer-credit datasets.
+
+A natural setting for this question is the common practice of assessing credit on two clocks. A full
+assessment, based on the complete set of financial statements, is set once a year; between annual
+revisions, the grade may be refreshed using only a small number of indicators that are cheap to
+collect. This practice is common in supply-chain and SME settings, where a large buyer or a lender
+re-scores many suppliers within the year but can afford a full statement-based review only annually.
+It produces two grades for the same firm---an annual grade and an interim grade---that need not
+agree, and the discrepancy is frequently treated as a problem to be reconciled rather than as a risk
+signal to be used. The object of this paper is the default-risk content of that reduced overlay:
+used as a low-cost device to monitor firms for deterioration between full reviews, does it actually
+measure default risk that the annual grade misses, and can that content be validated on public data?
+
+We argue that the two-clock structure is better understood through the lens of rating philosophy.
+The annual, full-statement grade is effectively a \emph{through-the-cycle} (TTC) assessment that
+smooths transitory fluctuations, whereas the interim update built from a few indicators is a
+low-cost \emph{point-in-time} (PIT) overlay \citep{altman2004stability,altman2006pit,loffler2004anatomy};
+Figure~\ref{fig:framework} illustrates the resulting two-clock structure.
+Framed this way, the operational question---why do the two grades differ?---becomes an empirical
+one about credit-risk measurement: does a deliberately parsimonious PIT overlay carry default-risk
+information beyond the TTC grade, and if so, for which firms? This is the question we study.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figures/fig_framework_ttc_pit}
+\caption{Conceptual framework. An annual full-statement grade is a through-the-cycle (TTC)
+assessment; an interim update built from two indicators is a point-in-time (PIT) overlay. The paper
+asks whether the parsimonious PIT overlay adds information beyond the TTC grade.}
+\label{fig:framework}
+\end{figure}
+
+Three features make the question non-trivial. First, the interim overlay uses only \emph{two}
+indicators, so whatever information it adds must survive extreme parsimony. Second, in practice the
+overlay is applied selectively---typically to the middle of the rating spectrum, while the
+investment-grade and near-default extremes are left to the annual review---and it is not obvious
+whether this selection is a prudent default or an avoidable loss of information. Third, the value of
+a two-indicator signal may be asymmetric: the credit literature consistently finds that markets
+respond to deterioration far more than to improvement \citep{holthausen1986,dichev2001}.
+
+Studying interim re-rating directly would require proprietary agency data with an observed mid-year
+revision for each firm. Absent such data, we develop a fully reproducible design on two public datasets
+that \emph{reconstructs} the two-clock structure rather than observing it: we treat the operational
+practice as a methodological hypothesis and test a feature-parsimony analogue of it, being explicit
+throughout that the temporal interpretation is exactly that---an interpretation (we return to this
+construct-validity limitation in Section~\ref{sec:discussion}). The first dataset is a corporate bankruptcy panel with a
+realized default outcome \citep{zieba2016}; the second is a cross-section of corporate credit
+ratings with agency letter grades. Because one dataset has a default outcome but no ratings and the
+other has ratings but no default outcome, the two analyses form a complementary
+internal/external-validity pair rather than two independent exercises.
+
+Our findings are as follows. The central result is that the overlay's value depends decisively on
+\emph{which} two indicators are chosen rather than on their number: across 66 indicator pairs the
+incremental likelihood ratio spans two orders of magnitude, the informative pairs dominate and the
+uninformative ones are indistinguishable from zero, and the ordering survives false-discovery control.
+The ordering reflects informativeness rather than a textbook category---a permutation test does not find
+the solvency category to outrank the liquidity/activity category---so in a reduced-form overlay the
+selection of indicators, not their count, is the first-order source of specification risk. The two
+supporting findings frame this one honestly. First, the overlay's incremental ranking power over the
+base grade is modest and fragile: significant on the pooled panel but, split by horizon, only near
+default, and not robust to a continuous base probability of default rather than a discretized grade, so
+we do not claim a uniform discrimination gain. Second, in the rating data (Study~2) a nonparametric
+recovery analysis shows that two indicators recover roughly half of the rating information in the full
+ratio set, with the loss significantly larger at the rating extremes than in the middle band, backed by
+a bootstrap confidence interval---an independent confirmation, on a different dataset and outcome, of
+the middle-band pattern. A downside pattern, in which deterioration appears more informative than
+improvement, is present in the point estimates but is not statistically established once the correct
+equal-slopes contrast is tested, and we report it only as a suggestive regularity.
+
+These results speak to the measurement, validation, and governance of credit risk. To the TTC/PIT
+literature \citep{altman2004stability,loffler2004anatomy,topp2010ttcpit} we add the question of whether a
+\emph{parsimonious} PIT overlay measures default risk beyond the TTC grade, and an answer that depends on
+the rating band. To the rating-transition and surveillance literature
+\citep{lando2002transitions,guttler2007adjustment} we offer an incremental-information test that
+distinguishes risk signal from noise in within-year grade changes. To the model-risk and
+model-validation literature \citep{bcbs2005validation,sr2011modelrisk,blochlinger2006,danielsson2002} we
+contribute a reproducible validation protocol for a reduced-form overlay and show that, within such an
+overlay, indicator identity rather than indicator count is a first-order source of specification risk. And to the SME and
+supply-chain credit literature \citep{altmansabato2007,berger2006} we provide a public-data method for
+evaluating interim re-rating policies without proprietary data. Throughout, the contribution is as much
+methodological as substantive: we show how the credit-risk content of a parsimonious overlay on a
+statement-based grade can be measured, tested, decomposed, and stress-tested for model risk with
+out-of-fold discrimination statistics on fully public data---the kind of transparent, reproducible
+validation that supervisory guidance on model risk management calls for \citep{sr2011modelrisk}.
+
+The remainder of the paper is organized as follows. Section~\ref{sec:literature} reviews the related
+literature. Section~\ref{sec:data} describes the two datasets. Section~\ref{sec:method} sets out the
+research design, hypotheses, and econometric models. Section~\ref{sec:results} reports the main
+results, Section~\ref{sec:robustness} the robustness analysis, Section~\ref{sec:discussion} the
+implications, and Section~\ref{sec:conclusion} concludes.
+
+%%=====================================================%%
+\section{Related literature}\label{sec:literature}
+
+Our study connects six strands of the credit-risk literature: the philosophy of
+through-the-cycle versus point-in-time ratings; the dynamics of rating transitions and
+surveillance; default prediction and rating replication from financial ratios; the role of
+parsimony in credit models; the asymmetry of credit information; and the model risk and
+validation of quantitative credit models. We also draw on the SME and supply-chain credit
+setting that motivates interim re-rating, and on the methodology for measuring and comparing
+model discrimination.
+
+\subsection{Through-the-cycle versus point-in-time ratings}
+Rating agencies deliberately smooth their grades over the business cycle. \citet{altman2004stability}
+show that agencies achieve stability through a prudent-migration policy and a change
+threshold, trading timeliness for fewer rating reversals, and \citet{altman2006pit} quantify
+how far such through-the-cycle (TTC) grades lag a point-in-time (PIT) benchmark.
+\citet{loffler2004anatomy} formalizes the TTC filter and the conditions under which it helps or
+harms default prediction, and later asks whether agencies can genuinely separate trend from
+cycle \citep{loffler2013lookthrough}. \citet{topp2010ttcpit} contrast the two philosophies and the
+problem of mapping between them, while the agency-side statement of the accuracy--stability
+trade-off is given by \citet{cantor2006tradeoff}. This literature frames our central object: an
+annual full-statement grade is effectively a TTC assessment, and a low-cost interim update is a
+PIT overlay. What it does not address is whether a \emph{deliberately parsimonious} PIT overlay,
+built from only a few indicators, adds information beyond the TTC grade.
+
+\subsection{Rating transitions, surveillance, and the noise-versus-information question}
+Whether a within-year rating change reflects information or noise is an old question.
+\citet{lando2002transitions} estimate migration intensities in continuous time and document
+rating drift, and \citet{fledelius2004nonparametric} show transition behavior varies with
+time-in-rating. \citet{nickell2000stability} and \citet{bangia2002migration} establish that
+transition matrices are not stationary but depend on industry and the business cycle, so that an
+observed grade change partly reflects cyclical conditions. \citet{guttler2007adjustment} document
+that agencies accelerate downgrades as default approaches, evidence that rating changes do carry
+information near distress. \citet{carey2001parameterizing} caution that default probabilities
+inferred from rating grades can be biased and unstable. Our paper reframes the ``grade change =
+risk'' concern operationally: rather than asking whether a mid-year change is noise, we test
+whether a two-indicator interim signal is \emph{incrementally predictive} of default once the
+annual grade is controlled for.
+
+\subsection{Default prediction and rating replication from financial ratios}
+The prediction of corporate default from financial ratios begins with the discriminant-analysis
+Z-score of \citet{altman1968}, the logit O-score of \citet{ohlson1980}, and the probit model of
+\citet{zmijewski1984}; \citet{shumway2001} shows that a discrete-time hazard formulation corrects
+the bias of single-period models. Machine-learning extensions---random forests and gradient
+boosting \citep{barboza2017,jones2017}, and the ensemble-of-boosted-trees model of
+\citet{zieba2016} that accompanies the Polish bankruptcy data we use---improve discrimination
+further. A parallel literature replicates \emph{ratings} rather than defaults from fundamentals,
+from the ordered-probit models of \citet{kaplan1979} and \citet{blume1998} to machine-learning
+rating predictors \citep{huang2004,shin1999,kim2012,golbayani2020}. We build on both: Study~1
+constructs a base grade and tests incremental default prediction, while Study~2 measures how much
+rating information two indicators recover.
+
+\subsection{Parsimony and feature selection in credit models}
+How many and which financial ratios a credit model needs is itself a research question.
+\citet{handhenley1997} review the construction of parsimonious scorecards, and a feature-selection
+literature \citep{tsai2009,dujardin2010,liang2015,hajek2013,laborda2021}, surveyed by
+\citet{lin2012}, shows that a small, well-chosen set of variables can preserve most of a model's
+accuracy and that the \emph{choice} of variables can matter as much as the classifier. This
+motivates our treatment of the interim overlay as a two-indicator problem and our finding that the
+identity of the two indicators is decisive.
+
+\subsection{Asymmetry of credit information}
+A robust empirical regularity is that credit markets react more to bad news than to good news.
+\citet{holthausen1986} and \citet{hand1992} find significant negative stock responses to
+downgrades but weak or insignificant responses to upgrades; \citet{goh1993} identify which
+downgrades convey bad news; and \citet{dichev2001} document negative long-run returns after
+downgrades with no reliable drift after upgrades. The asymmetry extends to CDS and bond markets
+\citep{hull2004,norden2004} and strengthens after Regulation FD \citep{jorion2005}. This evidence
+anchors our hypothesis that a two-indicator signal predicts default asymmetrically: deterioration
+should matter more than improvement.
+
+\subsection{SME and supply-chain credit; validation methodology}
+Interim re-rating is most consequential for SME suppliers assessed by large buyers.
+\citet{altmansabato2007} show that SME-specific default models outperform generic corporate models,
+\citet{altman2010nonfinancial} add non-financial information, and \citet{berger2006} map the
+lending technologies---including trade-credit and credit-scoring lending---used in this segment.
+The trade-credit and supply-chain-finance literature \citep{petersen1997,mian1992,giannetti2011,wuttke2013}
+describes the buyer--supplier financing relationships in which repeated, low-cost credit
+assessment arises. Finally, we rely on established tools for measuring and comparing
+discrimination: the AUC and its interpretation \citep{hanley1982}, the nonparametric test for
+correlated AUCs of \citet{delong1988}, the accuracy-ratio/CAP framework and tests of
+\citet{engelmann2003}, model-validation guidance \citep{stein2007,krahnen2001}, and standard
+logistic-regression inference \citep{hosmer2013}.
+
+\subsection{Model risk and the validation of reduced-form credit overlays}
+Whether a reduced-form overlay measures credit risk reliably is a model-risk and model-validation
+question. The credit-risk measurement tradition ranges from the structural default model of
+\citet{merton1974} to reduced-form intensity models \citep{jarrowturnbull1995,duffiesingleton1999} and
+the rating-system architectures that operationalize them inside institutions \citep{crouhy2001prototype}.
+Against this backdrop, supervisory and methodological work stresses that any such model must be
+\emph{validated}: the \citet{bcbs2005validation} studies set out discrimination and calibration
+standards for internal rating systems, \citet{sr2011modelrisk} frames model risk management---independent
+validation, testing of limitations, and governance---as a supervisory expectation, and
+\citet{sobehart2000benchmarking} and \citet{blochlinger2006} develop benchmarking and economic-value
+criteria for default models. A parallel caution holds that quantitative risk models can mislead when
+their specification is taken for granted \citep{danielsson2002,derman1996modelrisk}. Our out-of-fold,
+leakage-free protocol is a validation exercise in exactly this sense, and our indicator- and
+estimator-robustness analyses (Section~\ref{sec:robustness}) quantify the specification component of model
+risk in a radically reduced overlay---showing that \emph{which} indicators are chosen, not how many, is
+the dominant source of model risk.
+
+\subsection{Contribution}
+Relative to this literature we make five contributions. First, we formalize a widely used but
+little-studied practice---a parsimonious PIT overlay on a TTC grade---as a \emph{credit-risk measurement}
+question and test it directly with out-of-fold discrimination statistics. Second, and centrally, we show
+with a 66-pair placebo distribution, surviving false-discovery control and replicated across five
+datasets, that \emph{which} two indicators are used---their informativeness---is a first-order design
+choice and the dominant source of specification-related model risk, not a detail, while the mere count
+of indicators is not. Third, we document that the overlay's recovery of rating information is
+concentrated in the middle band and weakest at the extremes, backed by a bootstrap confidence interval,
+which rationalizes the common practice of excluding rating extremes from interim re-rating. Fourth, we treat the exercise as a model-validation protocol---out-of-fold, leakage-free, and
+robust across estimators---aligned with supervisory model-risk guidance \citep{bcbs2005validation,sr2011modelrisk}.
+Fifth, we provide a fully reproducible, public-data methodology for studying and governing interim
+re-rating without proprietary agency data.
+
+%%=====================================================%%
+\section{Data}\label{sec:data}
+
+We use two public datasets. One has a realized default outcome but no ratings; the other has agency
+ratings but no default outcome. Their complementary strengths motivate the two-study design.
+
+\subsection{Study 1: corporate bankruptcy panel}
+The first dataset is the Polish companies bankruptcy data of \citet{zieba2016}, distributed through
+the UCI Machine Learning Repository. It comprises five files indexed by forecast horizon: the
+$n$-th file contains financial ratios observed in year $n$ of the window and a binary indicator of
+bankruptcy within the subsequent $6-n$ years, so the fifth file corresponds to a one-year-ahead
+default horizon. Pooling the five horizons gives 43{,}405 firm-year observations with 2{,}091
+bankruptcies (an overall rate of 4.82\%); the rate rises monotonically from 3.86\% at the longest
+horizon to 6.94\% at the one-year horizon (Table~\ref{tab:polish}), a gradient we exploit as a
+pseudo-time dimension in the robustness analysis. Each observation carries 64 financial ratios.
+Following the solvency emphasis of \citet{altman1968}, we take the two proxy indicators to be a
+profitability ratio (net profit / total assets) and a leverage ratio (total liabilities / total
+assets); Figure~\ref{fig:proxy} shows both separate bankrupt from non-bankrupt firms in the expected
+direction. Missingness is low overall ($\approx 1.3$--$1.9\%$) except for one ratio with 39--45\%
+missing values; crucially, this heavily missing ratio is \emph{not} one of the two proxy indicators,
+both of which are almost fully observed. We median-impute missing values and add a missingness
+indicator for the heavily missing ratio, so that the base grade does not confound imputation with
+signal; results are unchanged if that ratio is dropped from the base grade entirely.
+
+\begin{table}[t]
+\centering
+\caption{Study 1 sample by forecast horizon (Polish bankruptcy data).}
+\label{tab:polish}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Horizon file & Observations & Bankruptcies & Rate (\%) \\
+\midrule
+1 (5-year)   & 7{,}027  & 271 & 3.86 \\
+2            & 10{,}173 & 400 & 3.93 \\
+3            & 10{,}503 & 495 & 4.71 \\
+4            & 9{,}792  & 515 & 5.26 \\
+5 (1-year)   & 5{,}910  & 410 & 6.94 \\
+\midrule
+Pooled       & 43{,}405 & 2{,}091 & 4.82 \\
+\botrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\textwidth]{figures/fig02_polish_proxy_by_class}
+\caption{Distribution of the two proxy indicators by bankruptcy status (one-year horizon).}
+\label{fig:proxy}
+\end{figure}
+
+\subsection{Study 2: corporate credit ratings}
+The second dataset is a cross-section of 2{,}029 corporate credit ratings compiled from public
+sources (OpenML dataset \#43344), spanning 2005--2016 and twelve sectors, with 25 financial ratios
+per firm and no missing values. Ratings are issued by five agencies---Standard \& Poor's (the
+plurality), Egan-Jones, Moody's, Fitch, and DBRS---so we include agency fixed effects throughout and
+report a Standard \& Poor's--only specification as a robustness check. The letter grades range from
+AAA to D; the middle band (BBB, BB, B) accounts for 72.1\% of observations and the extremes for the
+remainder (Figure~\ref{fig:ratingdist}), reproducing the concentration that makes middle-band interim
+re-rating the operationally relevant case. For the ordinal analysis we collapse the three rarest
+grades (CC, C, D; eight observations in total) into CCC, yielding a stable seven-grade scale. The two
+proxy indicators analogous to Study~1 are the debt ratio (leverage) and return on assets
+(profitability).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\textwidth]{figures/fig03_sp_rating_distribution}
+\caption{Rating distribution; middle-band grades (BBB/BB/B) are shaded darker.}
+\label{fig:ratingdist}
+\end{figure}
+
+%%=====================================================%%
+\section{Research design and methodology}\label{sec:method}
+
+Figure~\ref{fig:design} summarizes the design: two public datasets with complementary strengths provide
+complementary evidence on the information value of a parsimonious interim overlay. The datasets share no
+firms and differ in country, period, and outcome, so they are not two estimates of one quantity; rather,
+Study~1 speaks to incremental default prediction and Study~2 to rating-information recovery, and we read
+agreement between them as mutual corroboration rather than replication.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig_design_two_studies}
+\caption{Research design. The two datasets form a complementary validity pair---one has a default
+outcome but no ratings, the other ratings but no default outcome---and jointly test H1--H5.}
+\label{fig:design}
+\end{figure}
+
+\subsection{Reconstructing a parsimony benchmark on public data}
+We reconstruct a feature-parsimony benchmark on each dataset: a strong, information-rich base grade
+built from the full ratio set, against which a deliberately two-indicator overlay is tested. The
+two-clock interpretation---an annual full grade refreshed by a low-cost interim signal---motivates the
+construction but is not observed in the data, and we return to this construct-validity limitation in
+Section~\ref{sec:discussion}. In Study~1 the base grade is proxied by a
+\emph{base grade} $G$ obtained by estimating a probability of default from the 62 ratios that
+\emph{exclude} the two proxy indicators, via out-of-fold logistic regression, and discretizing the
+fitted probability into seven quantile buckets (a scale analogous to the AAA--CCC range). Excluding
+the two proxies from the base grade ensures that any incremental information attributed to the
+two-indicator overlay is genuinely new. The overlay signal $S$ is the out-of-fold fitted default
+probability from a logistic regression on the two proxies alone. The ``middle band'' is the set of
+central buckets; the ``extremes'' are the rest. All out-of-fold quantities use five-fold stratified
+cross-validation with a fixed seed. To avoid information leakage, the quantile bucket edges that define
+the grade are computed within each training fold only and applied to the held-out fold; we report a
+fully nested re-estimation in Section~\ref{sec:robustness} and confirm the main result survives it.
+Figure~\ref{fig:protocol} maps each step of this construction. We emphasize that the two-clock,
+annual-versus-interim reading is an \emph{interpretation} of a feature-parsimony design, not an
+observed timeline; the identification here is cross-sectional, and the econometric object is the
+incremental default-risk content of two indicators beyond a full-ratio grade. Section~\ref{sec:discussion}
+discusses the resulting construct-validity limitation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_protocol_simulation}
+\caption{Reconstruction pipeline (not a Monte Carlo simulation). The base grade is built from the
+other ratios and the two-indicator overlay from the two indicators; the sample is restricted to the
+middle band; and the final step tests whether the overlay adds information beyond the grade.}
+\label{fig:protocol}
+\end{figure}
+
+\subsection{Hypotheses}
+The design yields five testable hypotheses about the incremental default-risk content of a
+two-indicator overlay:
+\begin{itemize}
+\item[H1.] Controlling for the base grade, a worse two-indicator signal predicts higher default risk.
+\item[H2.] Adding the two-indicator signal to the base grade significantly improves discrimination (AUC / accuracy ratio).
+\item[H3.] The incremental information is asymmetric: deterioration predicts default more strongly than improvement reduces it.
+\item[H4.] The incremental value is larger in the middle band than at the extremes.
+\item[H5.] In rating recovery, the information lost by using only two indicators is larger at the extremes than in the middle.
+\end{itemize}
+
+The asymmetry hypothesis (H3) is motivated by a simple intuition rather than a formal model, and we
+treat it accordingly. The intuition is that, under a limited-liability payoff, the default-probability
+function is locally steep in the deterioration region and flat once a firm is safely solvent, so a
+reduced solvency signal might carry more information on the downside---in the same spirit as the market
+evidence that bad credit news moves prices more than good \citep{holthausen1986,dichev2001}. We stress
+that this is a motivating conjecture, not an identified mechanism: the sign pattern it predicts is also
+produced mechanically whenever the signal is more dispersed on the downside, and as Section~\ref{sec:results}
+shows we cannot statistically separate the two, so H3 is reported only as a suggestive direction. The
+middle-band hypotheses (H4--H5), by contrast, are supported by evidence that does not rely on this
+decomposition: at the investment-grade and near-default extremes two indicators are least able to add or
+recover information, and the Study~2 recovery result that establishes this (H5) is backed by a bootstrap
+confidence interval.
+
+\subsection{Econometric models (Study 1)}
+Default is modeled with a discrete-time logit including horizon fixed effects. The nested pair is
+\begin{align}
+\text{logit}\,\Pr(D_i=1) &= \alpha + \beta\,G_i + \boldsymbol{\delta}^{\top}X_i, \label{eq:m0}\\
+\text{logit}\,\Pr(D_i=1) &= \alpha + \beta\,G_i + \gamma\,S_i + \boldsymbol{\delta}^{\top}X_i, \label{eq:m1}
+\end{align}
+where $X_i$ collects horizon dummies. H1 is tested by the sign and significance of $\gamma$ in
+\eqref{eq:m1}; H2 by comparing the discrimination of \eqref{eq:m0} and \eqref{eq:m1} using the
+\citet{delong1988} test on paired out-of-fold ROC curves and a likelihood-ratio test. For H3 we
+decompose the overlay signal into its deviation from the grade-peer mean, $d_i = S_i - \bar{S}_{G(i)}$,
+split into a deterioration part $d_i^{+}=\max(d_i,0)$ and an improvement part $d_i^{-}=\min(d_i,0)$:
+\begin{equation}
+\text{logit}\,\Pr(D_i=1) = \alpha + \beta\,G_i + \gamma^{+}d_i^{+} + \gamma^{-}d_i^{-} + \boldsymbol{\delta}^{\top}X_i, \label{eq:h3}
+\end{equation}
+and test $|\gamma^{+}| > |\gamma^{-}|$. For H4 we interact the signal with a middle-band indicator
+$\text{Mid}_i$:
+\begin{equation}
+\text{logit}\,\Pr(D_i=1) = \alpha + \beta\,G_i + \gamma\,S_i + \eta\,(S_i\times\text{Mid}_i) + \theta\,\text{Mid}_i + \boldsymbol{\delta}^{\top}X_i, \label{eq:h4}
+\end{equation}
+with H4 corresponding to $\eta>0$.
+
+\subsection{Rating recovery and information loss (Study 2)}
+For Study~2 we measure how much rating information the two indicators recover relative to the full
+ratio set. Predictive recovery is assessed nonparametrically with a random forest (300 trees, $\sqrt{p}$ features
+per split, unrestricted depth, fixed seed) under five-fold cross-validation, scored by the quadratic
+weighted kappa (QWK), exact accuracy, and within-one-grade accuracy, with QWK confidence intervals
+obtained by 2{,}000-replication bootstrap. Statistical inference on the two proxies uses an ordered logit with agency fixed effects,
+\begin{equation}
+R_i^{*} = \boldsymbol{\theta}^{\top}Z_i + \varepsilon_i, \qquad R_i = r \iff \mu_{r-1} < R_i^{*} \le \mu_r, \label{eq:ordlogit}
+\end{equation}
+where $Z_i$ contains the two proxies and agency dummies. H5 is evaluated by comparing the
+within-one-grade recovery of the two-indicator and full models \emph{by band}, and visualized with a
+grade migration matrix. To benchmark the full ordinal model without the convergence problems of a
+high-dimensional maximum-likelihood ordered logit, we also estimate an $L_2$-penalized
+proportional-odds model (Appendix~\ref{app:po}); conclusions are invariant across estimators.
+
+\subsection{Discrimination metrics}
+Throughout we report the AUC and the accuracy ratio (Gini $=2\,\text{AUC}-1$), interpreting them per
+\citet{hanley1982} and \citet{engelmann2003}, the Brier score for calibration, and QWK for ordinal
+recovery. All discrimination comparisons are out-of-fold, and incremental comparisons use the
+\citet{delong1988} and likelihood-ratio tests.
+
+%%=====================================================%%
+\section{Results}\label{sec:results}
+
+\subsection{Study 1: incremental default prediction}
+Table~\ref{tab:h1h2} reports the nested comparison. All figures in this paper come from a single
+reproducible pipeline (fixed seeds; code released), so the pooled increment reported here matches the
+pooled row of the horizon decomposition in Table~\ref{tab:horizon} up to rounding. Adding the two-indicator
+signal raises the out-of-fold AUC from 0.729 to 0.739 and the accuracy ratio from 0.458 to 0.477. The
+level improvement is small---unsurprisingly, since the base grade already uses 62 ratios---but on the
+pooled panel it is significant: the \citet{delong1988} statistic is $z=7.77$ ($p=7.8\times10^{-15}$),
+the likelihood-ratio statistic is 82.3 ($p<10^{-18}$), and the coefficient on $S$ in \eqref{eq:m1} is
+positive and significant.
+Figure~\ref{fig:roc} shows the two ROC curves. On the pooled panel, H1 and H2 are supported:
+controlling for a grade built from all other ratios, the two indicators still carry default
+information, and a fully nested, leakage-free re-estimation (grade buckets formed within training
+folds only; Section~\ref{sec:robustness}) confirms the result with a slightly attenuated but still
+significant increment ($z=3.16$, $p=1.6\times10^{-3}$).
+
+\paragraph{The pooled increment is horizon-dependent and partly a pooling effect.} We stress that this
+pooled significance must be read with care, because the five horizon files pool observations that are
+not independent: the same firm can appear across files, so the effective sample is smaller than the
+nominal 43{,}405, and the data carry no firm identifier with which to cluster or to form firm-grouped
+cross-validation folds (a limitation we state in Section~\ref{sec:discussion}). Splitting the pooled
+test into its five single-horizon files---each an independent cross-section---shows that the increment
+is \emph{not} uniformly significant: at the three longer horizons the DeLong increment is
+insignificant ($z=1.4$, $-0.6$, $1.6$), and it becomes significant only at the two shortest,
+near-default horizons ($z=4.2$ and $4.7$), where the overlay is most valuable (Table~\ref{tab:horizon}).
+The pooled $z$ therefore reflects both sample inflation and a genuine concentration of the signal close
+to default; we do not interpret it as evidence of a large, uniform incremental effect. This horizon
+gradient---stronger closer to default---is itself consistent with the overlay behaving as a
+near-term deterioration signal.
+
+\begin{table}[t]
+\centering
+\caption{Incremental discrimination by forecast horizon (single-horizon files, independent
+cross-sections). The pooled significance concentrates at the near-default horizons.}
+\label{tab:horizon}
+\begin{tabular}{@{}lrrrc@{}}
+\toprule
+Horizon file & $n$ & $\Delta$AUC & DeLong $z$ & $p$ \\
+\midrule
+Pooled (5 horizons)        & 43{,}405 & $+0.0098$ & 7.77 & $7.8\times10^{-15}$ \\
+\midrule
+1 (5-year)                 & 7{,}027  & $+0.0045$ & 1.42 & 0.155 \\
+2 (4-year)                 & 10{,}173 & $-0.0006$ & $-0.58$ & 0.563 \\
+3 (3-year)                 & 10{,}503 & $+0.0035$ & 1.57 & 0.115 \\
+4 (2-year)                 & 9{,}792  & $+0.0094$ & 4.24 & $2.2\times10^{-5}$ \\
+5 (1-year)                 & 5{,}910  & $+0.0136$ & 4.66 & $3.1\times10^{-6}$ \\
+\botrule
+\end{tabular}
+\end{table}
+
+\paragraph{Economic significance.} Statistical significance aside, the \emph{economic} magnitude of the
+pooled increment is modest, as expected when the base grade already exploits 62 ratios. Over the whole
+sample the integrated discrimination improvement is small (IDI $=0.004$) and the Brier skill score is
+0.4\%; the continuous net reclassification index is in fact slightly negative overall ($-0.06$), and the
+minimum-misclassification-cost reduction at plausible cost ratios ($5$:$1$ to $20$:$1$) ranges only from
+$-0.3\%$ to $+1.0\%$. The picture changes once attention is restricted to the middle band, where
+interim re-rating is actually applied: the net reclassification index there is positive and
+economically meaningful ($\text{NRI}_{\text{mid}}=+0.21$). The overlay is thus best read not as a
+uniform accuracy gain but as a targeted reclassification tool whose value concentrates in the middle of
+the spectrum---the same conclusion the band-moderation test reaches below.
+
+\paragraph{The discrimination increment depends on discretizing the grade.} The base grade above is
+discretized into seven buckets, which discards within-bucket variation in the underlying probability of
+default and is the natural analogue of an agency letter scale. It is also, however, a modelling choice
+that can create room for a continuous overlay to recover discarded signal. We therefore re-run the
+nested test against a \emph{continuous} base probability of default---the base logit itself, with no
+bucketing. Against this stronger benchmark the two-indicator overlay no longer improves ranking: the
+out-of-fold AUC does not rise but instead falls, significantly so (pooled $\Delta\text{AUC}=-0.006$;
+DeLong $z=-1.99$, $p=0.047$), while the likelihood-ratio statistic remains positive ($\text{LR}=247$). The
+two readings are consistent once separated: the two indicators improve the \emph{calibration} of the
+fitted default probability (hence the positive LR) but not its \emph{discrimination} once the grade is
+continuous. We therefore do not claim a robust discrimination increment from the overlay; the AUC gains
+in Table~\ref{tab:h1h2} are specific to a discretized grade and should be read as such. The findings we
+do emphasize---indicator identity, asymmetry, and the band structure---do not rest on this increment,
+as the robustness analysis shows.
+
+\begin{table}[t]
+\centering
+\caption{Study 1: incremental discrimination over a discretized base grade (out-of-fold). Against a
+continuous base PD the AUC increment vanishes; see text.}
+\label{tab:h1h2}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & AUC & Accuracy ratio & Brier \\
+\midrule
+$M_0$: base grade        & 0.729 & 0.458 & 0.0438 \\
+$M_1$: base grade $+$ 2-proxy & 0.739 & 0.477 & 0.0436 \\
+\midrule
+\multicolumn{4}{@{}l}{DeLong $z=7.77$ ($p=7.8\times10^{-15}$); LR $=82.3$ ($p<10^{-18}$).}\\
+\botrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.55\textwidth]{figures/fig04_study1_roc_m0_m1}
+\caption{ROC curves for the base-grade model ($M_0$) and the augmented model ($M_1$).}
+\label{fig:roc}
+\end{figure}
+
+\paragraph{A downside pattern in the point estimates (H3), reported as suggestive only.} Estimating
+\eqref{eq:h3}, the point estimates are suggestive of asymmetry: deterioration relative to grade peers
+enters strongly (coefficient $2.81$, $z=7.7$) while improvement is smaller and insignificant
+(coefficient $1.22$, $z=1.5$). We are careful, however, not to overstate this. The correct test of
+asymmetry is of \emph{equal slopes}, $\gamma^{+}-\gamma^{-}=0$, since under the hinge decomposition
+$d=d^{+}+d^{-}$ a symmetric response is a single common slope; and that contrast is \emph{not}
+significant ($\gamma^{+}-\gamma^{-}=1.6$, $p=0.11$). The improvement coefficient is same-signed and
+non-negligible, so the honest statement is that improvement is estimated less precisely than
+deterioration, not that it is zero. Two further facts counsel caution. The deviation $d^{+}$ has a
+substantially wider spread than $d^{-}$ (standard deviations $0.052$ versus $0.031$), because the fitted
+signal is right-skewed at a $4.8\%$ event rate, so a larger and better-identified downside slope can
+arise from the distribution of $d$ alone, with no payoff asymmetry; and against a continuous base
+probability of default the sign pattern reverses (improvement becomes the significant side), which is
+the signature of a bucketing artifact rather than an economic effect. We therefore report the downside
+pattern as a suggestive regularity---consistent in direction with the market evidence that bad credit
+news moves prices more than good \citep{holthausen1986,dichev2001}---but do \emph{not} claim it as an
+established asymmetry, and it is not part of the paper's contribution. Table~\ref{tab:h3robust} records
+how the pattern behaves across specifications; the one specification in which the two slopes differ
+non-trivially (the non-solvency placebo pair) does so in the \emph{opposite} direction and
+insignificantly, underscoring that the pattern is not robust enough to build a claim on.
+
+\begin{table}[t]
+\centering
+\caption{The downside point-estimate pattern (H3) across specifications, reported as suggestive. The
+correct asymmetry test ($\gamma^{+}-\gamma^{-}=0$) is not rejected in the baseline ($p=0.11$); the
+pattern reverses against a continuous base PD.}
+\label{tab:h3robust}
+\begin{tabular}{@{}lrrc@{}}
+\toprule
+Specification & $z(d^{+})$ & $z(d^{-})$ & $\gamma^{+}-\gamma^{-}=0$ \\
+\midrule
+Baseline (logit, discretized grade) & 7.7 & 1.5 & not rejected ($p=0.11$) \\
+Probit (symmetric link)             & 8.7 & 0.5 & direction unchanged \\
+Global-mean deviation               & 9.9 & $-0.2$ & direction unchanged \\
+Non-solvency placebo pair           & 0.7 & $-1.7$ & reverses, insignificant \\
+Continuous base PD                  & 1.6 & $-2.6$ & reverses \\
+\botrule
+\end{tabular}
+\end{table}
+
+\paragraph{Band moderation (H4).} The interaction of the signal with the middle-band indicator in
+\eqref{eq:h4} is positive and significant (coefficient 5.86, $z=5.06$): the incremental value of the
+two indicators is concentrated in the middle of the grade distribution. Because logit interaction
+coefficients are not directly interpretable in magnitude, we also report the average marginal effect of
+the overlay signal, which is about three times larger in the middle band than at the extremes---the
+same conclusion on the probability scale. Figure~\ref{fig:h4} shows the incremental AUC is markedly
+larger in the middle band than at the extremes. We note, however, that this interaction is contingent
+on the quantile-bucketed grade (Section~\ref{sec:robustness}); the firmer evidence for the middle-band
+pattern is the Study~2 recovery result (H5), which does not rely on the Study~1 bucketing.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.5\textwidth]{figures/fig06_study1_h4_band_gain}
+\caption{Incremental AUC ($M_1-M_0$) within the middle band versus the extremes.}
+\label{fig:h4}
+\end{figure}
+
+\subsection{Study 2: rating recovery and information loss}
+Table~\ref{tab:recovery} reports rating recovery. Two indicators recover a quadratic weighted kappa
+of 0.345 against 0.654 for the full 25-ratio model, and within-one-grade accuracy of 77.0\% against
+90.9\%---about half of the full information, echoing the ``intermediate zone'' of Study~1
+(Figure~\ref{fig:qwk}). The two kappas are well separated: their 2{,}000-replication bootstrap 95\%
+confidence intervals, $[0.625,0.680]$ for the full model and $[0.303,0.384]$ for the two indicators, do
+not overlap. In the ordered logit \eqref{eq:ordlogit}, both proxies are significant with
+the expected signs---leverage enters positively (debt ratio 0.52, $z=11.9$) and profitability
+negatively (return on assets $-0.87$, $z=-3.3$)---and remain so under agency fixed effects.
+
+\begin{table}[t]
+\centering
+\caption{Study 2: rating recovery (random forest, five-fold).}
+\label{tab:recovery}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Model & QWK & Accuracy & Within-1 grade \\
+\midrule
+Full (25 ratios)       & 0.654 & 0.509 & 0.909 \\
+2 proxies (leverage, profitability) & 0.345 & 0.315 & 0.770 \\
+\botrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.45\textwidth]{figures/fig07_study2_recovery_qwk}
+\hfill
+\includegraphics[width=0.5\textwidth]{figures/fig08_study2_band_within1}
+\caption{Left: rating recovery (QWK), full versus two indicators. Right: within-one-grade recovery by band.}
+\label{fig:qwk}
+\end{figure}
+
+\paragraph{Information loss by band (H5).} The within-one-grade information lost by using only two
+indicators is larger at the extremes (18.4 percentage points) than in the middle band (11.6
+percentage points). This band gap is statistically distinguishable from zero, not merely a raw
+difference: a 2{,}000-replication bootstrap of the within-one-grade accuracy gap between the middle
+band and the extremes gives a point estimate of about 13.7 percentage points with a 95\% confidence
+interval of $[9.3,\,18.0]$, which excludes zero. The migration matrix (Figure~\ref{fig:migration})
+shows the two-indicator model pulls firms toward the center and rarely predicts the extremes, which is
+where its recovery is weakest. H5 is supported: the two indicators are least adequate precisely where
+interim re-rating is, in practice, withheld.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/fig09_study2_migration_heatmap}
+\caption{Grade migration: actual grade versus the grade predicted from two indicators.}
+\label{fig:migration}
+\end{figure}
+
+%%=====================================================%%
+\section{Robustness and model-risk analysis}\label{sec:robustness}
+
+The analyses in this section double as a model-risk assessment of the overlay: they probe the three
+specification choices on which a reduced-form overlay could fail---how the base grade is discretized
+(discretization risk), which estimator maps indicators to grades (estimator risk), and which indicators
+enter the signal (specification risk). Reporting all three is the kind of sensitivity and limitation
+testing that model-validation standards expect \citep{bcbs2005validation,sr2011modelrisk}.
+
+\subsection{Bucket-boundary sensitivity}
+The base grade in Study~1 discretizes a continuous default probability, so we vary the number of
+buckets (five, seven, ten) and the boundary rule (quantile versus fixed probability-of-default cuts).
+Under quantile grading the incremental result is stable: the DeLong test is significant at all three
+bucket counts and the H4 interaction remains positive with $z$ between 4.7 and 5.2
+(Figure~\ref{fig:bucket}). Under arbitrary fixed cuts the base grade becomes weak (AUC 0.56) and the
+overall incremental effect inflates, but the band definition is distorted and the H4 interaction flips
+sign. We read this plainly: the asymmetry result (H3) is robust to bucket count, but the band-moderation
+result (H4) is contingent on balanced, quantile-based grades and does not survive arbitrary cuts. We
+therefore treat H4 as suggestive rather than firmly established, and note that the independent
+middle-band evidence from Study~2 (H5), which does not rely on the Study~1 bucketing and is supported by
+a bootstrap confidence interval, is the stronger basis for the band claim.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/fig10_robust_bucket_h4z}
+\caption{H4 interaction $z$-statistic across grade-bucket schemes; dashed lines mark $\pm1.96$.}
+\label{fig:bucket}
+\end{figure}
+
+\subsection{A regularized ordinal benchmark and cross-estimator agreement}
+The high-dimensional maximum-likelihood ordered logit with full fixed effects fails to converge, so we
+re-estimate the full rating model with an $L_2$-penalized proportional-odds specification
+(Appendix~\ref{app:po}), which converges and preserves the ordering (full-model QWK 0.40 versus 0.13
+for two indicators). Crucially, the band asymmetry underlying H5 replicates across three different
+estimators---random forest, maximum-likelihood ordered logit, and the regularized proportional-odds
+model---each showing larger two-indicator information loss at the extremes than in the middle
+(Figure~\ref{fig:h5three}). The conclusion does not hinge on a single estimator.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\textwidth]{figures/fig11_robust_h5_three_methods}
+\caption{Two-indicator information loss (within-one-grade) by band across three estimators.}
+\label{fig:h5three}
+\end{figure}
+
+\subsection{Leakage-free re-estimation and imbalance}
+Because the base grade discretizes a fitted probability, we re-estimate Study~1 in a fully nested
+scheme: within each training fold we fit the base model, form the quantile bucket edges, fit the
+signal, and fit $M_0$ and $M_1$, then predict the held-out fold, so no test information enters the grade
+or its buckets. The increment survives: the out-of-fold AUC still rises under the fully nested scheme
+with a DeLong $z=3.16$ ($p=1.6\times10^{-3}$)---attenuated relative to the in-sample-bucket version but
+still significant---confirming that the pooled result is not an artifact of bucket leakage. The default rate of
+4.8\% is handled by class weighting; AUC and the accuracy ratio are stable across treatments (balanced
+weighting 0.740/0.480 versus event oversampling 0.743/0.485), while an unweighted model is weaker
+(0.671), so we retain balanced weighting throughout.
+
+\subsection{Indicator choice}
+We first replace the leverage--profitability pair with a liquidity--activity pair (current ratio and
+asset turnover) in both studies. The contrast is stark (Table~\ref{tab:indicator},
+Figure~\ref{fig:indicator}): in Study~1 the liquidity--activity signal adds nothing beyond the base
+grade (likelihood-ratio statistic 0.7, $p=0.39$), against 82.3 for leverage--profitability; in Study~2
+its rating-recovery QWK is 0.145 against 0.345.
+
+To show this is not an artifact of a single hand-picked pair, we compute the incremental likelihood
+ratio of every pair drawn from twelve ratios spanning leverage, profitability, liquidity, and
+activity, over a fixed full-model grade (66 pairs; Figure~\ref{fig:pairs}). The ordering is wide and
+systematic: the incremental likelihood ratio spans from near zero to about 90, so some pairs add two
+orders of magnitude more information than others, even though every pair adds exactly two regressors.
+We are deliberately careful about \emph{what} this ordering reflects, because it is easy to over-read.
+It is not a clean ``solvency beats liquidity'' category effect: a permutation test on the broad
+category labels does not reject the null that the solvency category and the liquidity/activity category
+have the same mean incremental LR ($p=0.80$), and the highest-ranking pairs are in fact those containing
+one particular high-information working-capital ratio, while some textbook leverage pairs rank near the
+bottom. What the distribution shows is therefore an \emph{informativeness} ordering, not a category
+ordering: the pairs that carry outcome-relevant information dominate, and the broad accounting label of
+a ratio is a poor guide to whether it does. This is the right reading of the headline result. A sceptic
+might object that \emph{any} two extra predictors will add a statistically detectable, if tiny,
+increment beyond a fixed grade, so that the increment in Table~\ref{tab:h1h2} is mechanical. The
+pairwise distribution refutes the strong form of this: the 66 pairs do not cluster at a small positive
+value but span a wide range whose lower end is statistically indistinguishable from zero, functioning as
+a within-design placebo. Two indicators add little when they carry little information and a great deal
+when they carry much; the increment is driven by indicator \emph{identity}---which indicators enter---not
+by the act of adding two regressors. Of the 66 tests, 56 are significant at the 5\% level without
+correction, 51 survive a conservative Bonferroni threshold, and 56 survive a Benjamini--Hochberg
+false-discovery-rate control, so the spread of the distribution is not an artifact of multiplicity. The
+one caveat we flag is that this pairwise distribution is estimated on the pooled Polish panel, which is
+not firm-independent (Section~\ref{sec:discussion}); the external replication of
+Section~\ref{sec:multidata} provides the firm-independent evidence that the identity-over-count pattern
+is not a pooling artifact. In corporate-default settings the informative ratios happen to be solvency
+ratios, the dimensions emphasized since \citet{altman1968}, but we do not claim solvency is privileged
+as a \emph{category}---only that informativeness, of which solvency is the default-relevant instance,
+governs the overlay. The downside pattern, by contrast, holds for neither pair strongly enough to be
+established (H3), so we do not rest anything on it.
+to indicator choice.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig13_review_all_pairs_LR}
+\caption{Incremental likelihood ratio of each two-ratio signal over a fixed full-model grade (66 pairs
+from twelve ratios), ordered by informativeness. The ordering reflects the information a pair carries,
+not its broad accounting category (a permutation test on the solvency versus liquidity/activity label
+gives $p=0.80$); the pair used in the main analysis is shaded darker. Horizontal bars mark medians.}
+\label{fig:pairs}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Indicator-choice comparison across both studies.}
+\label{tab:indicator}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Indicator pair & Study 1 incremental LR & Study 2 recovery QWK \\
+\midrule
+Leverage $+$ profitability & 82.3 & 0.345 \\
+Liquidity $+$ activity     & 0.7  & 0.145 \\
+\botrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\textwidth]{figures/fig12_robust_indicator_choice}
+\caption{Indicator choice: Study 1 incremental LR (left) and Study 2 recovery QWK (right).}
+\label{fig:indicator}
+\end{figure}
+
+\subsection{External replication on independent cross-sections}\label{sec:multidata}
+The Polish panel's one limitation we cannot repair internally---pooled, repeated-firm observations with
+no firm identifier---motivates a external check on data that are free of it. We therefore replicate the
+two central tests on four additional, firm-independent cross-sections from the consumer-credit and
+classification literature: a peer-to-peer consumer-loan dataset ($n=32{,}581$), the ``Give Me Some
+Credit'' delinquency data ($n=150{,}000$), the Taiwan credit-card default data ($n=30{,}000$), and, as a
+non-credit control, the Adult income-classification data ($n=48{,}842$). Each is a single cross-section
+of independent records, so the pooling concern of Section~\ref{sec:results} does not arise. On each we
+build a base grade from all other features, discretize it into seven buckets exactly as in
+Study~1, and test (i) whether a two-indicator overlay adds out-of-fold discrimination, and (ii) whether
+a chosen two-feature pair outperforms random two-feature placebo pairs.
+
+One pattern replicates cleanly and one is more nuanced, and we report both rather than only the
+favourable reading (Table~\ref{tab:multidata}). First, a two-indicator overlay adds significant
+out-of-fold discrimination in every independent dataset (DeLong $z$ from 11.8 to 44.1), including the
+non-credit Adult control, so the incremental-information finding is not special to the Polish sample---but,
+precisely because it also holds in the non-credit control, it confirms that ``two informative features
+add something to a discretized grade'' is a \emph{generic} property, not evidence for a credit-specific
+mechanism. Second, the placebo contrast must be read carefully. The chosen pair beats the median random
+pair by large factors in three of four datasets, but the relevant content differs: in the Polish panel
+and the rating cross-section the dominant pair is genuinely a solvency pair (leverage and profitability),
+whereas in the Taiwan data the dominant pair pairs the credit limit with the most recent repayment-delay
+status---a near-outcome variable, not a solvency ratio---so its dominance reflects proximity to the
+outcome rather than solvency content. In the Give Me Some Credit data the solvency-type pair
+(debt ratio and income) in fact \emph{loses} to the median random pair (ratio 0.3). The honest,
+cross-dataset generalization is therefore the weaker one: within a two-feature overlay, the
+\emph{identity} of the pair---whether it carries the outcome-relevant information---dominates the mere
+fact of using two features, and in genuine corporate-default settings (Polish, ratings) that
+outcome-relevant information is solvency. We do not claim that solvency content universally governs the
+increment; the consumer datasets show the operative property is informativeness, of which solvency is
+the default-relevant instance.
+
+\begin{table}[t]
+\centering
+\caption{External replication on four independent cross-sections (plus the single-horizon Polish file).
+A two-indicator overlay adds out-of-fold discrimination in every independent dataset. The final column
+is the incremental-LR ratio of the chosen pair to the median random placebo pair; the chosen pair and
+whether it is a solvency pair are noted, since the dominant pair is a solvency pair only in the
+genuine-default settings.}
+\label{tab:multidata}
+\small
+\begin{tabular}{@{}lrrrcl@{}}
+\toprule
+Dataset & $n$ & $\Delta$AUC & $z$ & LR ratio & Chosen pair (solvency?) \\
+\midrule
+Consumer loans (P2P)       & 32{,}581  & $+0.092$ & 29.2 & 21.4 & debt burden $+$ income \\
+Give Me Some Credit         & 150{,}000 & $+0.008$ & 11.8 & 0.3  & debt ratio $+$ income (yes) \\
+Taiwan credit card          & 30{,}000  & $+0.041$ & 13.8 & 24.8 & limit $+$ recent delay (no) \\
+Adult (control)             & 48{,}842  & $+0.088$ & 44.1 & 4.7  & education $+$ hours (non-credit) \\
+\midrule
+Polish (1-yr, single)       & 7{,}027   & $+0.005$ & 1.42 & 7.9 & leverage $+$ profitability (yes) \\
+\botrule
+\end{tabular}
+\end{table}
+
+%%=====================================================%%
+\section{Discussion}\label{sec:discussion}
+
+Our results speak to the design of interim re-rating policies. The central message is that a
+parsimonious point-in-time overlay is informative, but conditionally so, and the conditions are
+economically interpretable.
+
+\paragraph{Band targeting is justified.} The incremental value of the two-indicator signal is
+concentrated in the middle band (H4), and the rating information that two indicators fail to recover is
+largest at the extremes (H5). Both results, obtained on different datasets with different outcomes,
+point the same way: confining interim re-rating to the middle of the rating spectrum---common practice
+---loses little, because near-default and high-grade firms are precisely where two indicators are least
+adequate. The practice that is often defended on risk-aversion grounds has a measurement rationale.
+
+\paragraph{A possible downside tilt, not established.} The point estimates hint that deterioration is
+more informative than improvement, which would mirror the long-standing market evidence that downgrades
+move prices more than upgrades \citep{holthausen1986,dichev2001,norden2004}. We are careful not to build
+on this: as Section~\ref{sec:results} shows, the correct equal-slopes test does not establish the
+asymmetry, the downside deviation is more dispersed than the upside, and the pattern reverses against a
+continuous base probability of default. We therefore do not recommend an asymmetric, downside-only use
+of the overlay on the strength of our evidence; whether such a tilt is real is a question for data with
+a genuine two-period structure. What our evidence does support about \emph{where} the overlay informs is
+the band pattern of the previous paragraph, which rests on the independent Study~2 recovery result.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig_band_schematic}
+\caption{Where the overlay informs. Its incremental value concentrates in the middle band
+(BBB--B), where the overlay is applied, and the two-indicator information loss is largest at the rating
+extremes, where it is withheld. The direction of the effect (whether deterioration is more informative
+than improvement) is not statistically established (H3) and is therefore not depicted.}
+\label{fig:band}
+\end{figure}
+
+\paragraph{Indicator selection is a first-order choice---and the main model risk.} The overlay works
+with leverage and profitability but not with liquidity and activity. Because an interim re-rating scheme
+is defined as much by its two indicators as by its existence, the selection of those indicators deserves
+the same scrutiny as the decision to re-rate at all. This connects to the feature-selection literature
+\citep{tsai2009,hajek2013,laborda2021}: in a radically reduced model, identity dominates count. In
+model-risk terms, the choice of indicators---not the discretization or the estimator, both of which leave
+the qualitative results intact---is where the overlay is most exposed to specification error, so it is the
+choice a validation process should scrutinize most closely \citep{danielsson2002,sr2011modelrisk}. The
+pairwise analysis sharpens this further: it is specifically the \emph{solvency} content (leverage, then
+profitability) that carries the overlay, so an interim scheme should be built around solvency indicators
+rather than liquidity or turnover.
+
+\paragraph{Implications, stated as conditional conjectures.} The implications below follow from the
+measured \emph{shape} of the information---where and in which direction two indicators inform---rather
+than from an observed re-rating process, and we state them as conjectures to be tested on data with a
+genuine two-period structure, not as validated policy prescriptions. Subject to that caveat, three
+implications suggest themselves. First, because the overlay's incremental value is real but
+economically modest in aggregate and concentrated in the middle band and on the downside, a reduced
+two-indicator signal looks better suited to flagging firms for fuller review when two solvency
+indicators deteriorate than to symmetric, whole-spectrum re-grading. Second, the band result suggests
+that such a signal adds little for investment-grade and near-default names, where two indicators are
+least adequate, so a reduced overlay should not drive mechanical actions there. Third, because the
+increment rests on indicator identity rather than count, a reduced scheme should fix and validate its
+solvency indicators explicitly rather than treat a two-indicator model as safe merely because it is
+small. Whether these conjectures carry over to SME and supply-chain settings, in which buyers re-score
+many suppliers cheaply and frequently \citep{altman2005emerging,berger2006,giannetti2011}, is an
+empirical question for data from those settings; our evidence speaks to the shape of the information,
+not to its magnitude in any particular market.
+
+\paragraph{Limitations.} Five limitations bound the interpretation. First and most important, the
+public datasets do not contain an observed annual-versus-interim timeline, so the two-clock structure is
+a \emph{reconstruction}: we operationalize it by separating the indicator set and, in robustness, by the
+forecast-horizon gradient, but we cannot observe a single firm's own mid-year revision. The construct is
+therefore an interpretation of a feature-parsimony result, and confirming it on data with a genuine
+two-period structure is the first-order task for future work. Second, the pooled Polish files do not
+carry a firm identifier, so the same firm may recur across the five horizon files and the pooled
+observations are not independent. We cannot cluster standard errors by firm or form firm-grouped
+cross-validation folds on these data; the pooled significance should therefore be read as an upper
+bound, and we rely instead on the single-horizon decomposition (Table~\ref{tab:horizon}) and on the
+four firm-independent cross-sections of Section~\ref{sec:multidata}, where no such dependence exists, to
+establish that the qualitative findings do not hinge on the pooling. Third, the Study~1 base grade is a
+constructed probability-of-default grade rather than an agency grade, so its boundaries are a modeling
+choice (we show the core results are robust to them and are leakage-free). Fourth, Study~2 has agency
+grades but no default outcome, so its evidence concerns information recovery, not predictive accuracy.
+The two datasets share no firms and overlap in neither country nor period, so they corroborate rather
+than replicate each other: agreement between them is mutual support across independent samples and
+outcomes, not a re-estimate of one quantity, and we read it only that way. Fifth, the data are Polish firms and a
+multi-agency, largely US rating set rather than a domestic SME or single-market setting, so the external
+validity of the specific magnitudes---though not, we argue, of the qualitative shape---awaits replication
+on SME and supply-chain data; our claims are methodological, about the \emph{shape} of the information
+rather than its exact level.
+
+%%=====================================================%%
+\section{Conclusion}\label{sec:conclusion}
+
+We asked, for a radically reduced credit overlay of only two indicators, whether its specification
+risk comes from how many indicators it uses or from which, using public datasets and a fully
+reproducible, out-of-fold design. Our central finding is that identity dominates count. Across 66
+indicator pairs the incremental likelihood ratio spans two orders of magnitude; the pairs that carry
+outcome-relevant information sit at the top and the uninformative ones are indistinguishable from zero,
+and the ordering survives Bonferroni and false-discovery control. The ordering reflects informativeness
+rather than a broad accounting category---a permutation test does not find solvency ratios to outrank
+liquidity ratios as categories---so it is which indicators carry information, not their textbook label
+or their number, that matters; in corporate-default settings the informative ones are solvency ratios.
+Pairs that carry information behave entirely differently from those that do not, though both add exactly
+two regressors, so in a reduced-form overlay indicator selection---not indicator count---is the
+first-order source of specification risk. Two further findings frame this one. The overlay's incremental ranking power is
+modest and fragile: significant on the pooled panel but concentrated near default, and not robust to a
+continuous base probability of default, so we claim no uniform discrimination gain. And a nonparametric
+rating-recovery analysis shows two indicators are least adequate at the rating extremes and most
+adequate in the middle band, a gap backed by a bootstrap confidence interval. A downside-asymmetry
+pattern appears in the point estimates but, once the correct equal-slopes contrast is tested, is not
+statistically established, and we report it only as suggestive.
+
+Taken together, the results characterize what governs the information in a radically reduced,
+two-indicator overlay: its value turns on indicator identity, and its recovery is weakest at the rating
+extremes. As a conditional conjecture for practice---to be tested on data with a genuine two-period
+structure---this is consistent with building a reduced overlay around middle-band firms and solvency
+indicators, and with validating the \emph{choice} of those indicators as the point of greatest
+specification risk rather than treating a two-indicator model as safe merely because it is small. For
+research, the paper offers a public-data template for testing which indicators, not how many, carry the
+information in parsimonious credit overlays without proprietary agency data. The natural next step is to replicate the design on data with an observed two-period timeline,
+which would let the magnitudes---not only the shape---of the information be estimated directly.
+
+%%=====================================================%%
+\backmatter
+
+%% Acknowledgements omitted in the double-blind version (add on acceptance).
+
+\section*{Declarations}
+
+\noindent\textbf{Funding.} The authors received no specific funding for this work.
+
+\medskip
+\noindent\textbf{Competing interests.} The authors declare no competing financial or non-financial
+interests.
+
+\medskip
+\noindent\textbf{Data availability.} Both datasets are public: the Polish companies bankruptcy data
+\citep{zieba2016} distributed through the UCI Machine Learning Repository, and the corporate
+credit-rating data (OpenML dataset \#43344). All code, notebooks, and figures needed to reproduce every
+result and exhibit are available at an anonymized repository,
+\url{https://anonymous.4open.science/r/parsimonious-interim-rerating-6B71}; the repository documents
+how to obtain the data, and analyses run on fixed random seeds, so the reported figures are
+deterministic.
+
+\medskip
+\noindent\textbf{Declaration of generative AI and AI-assisted technologies.} During the preparation of
+this manuscript, the author used Claude (Anthropic), a generative AI assistant, to help draft and edit
+the text, to write and run the Python analysis code, to prepare the figures, and to search and organize
+the cited literature. After using this tool, the author reviewed, verified, and edited all
+content---including the study design, the data analysis and numerical results, the figures, and the
+references---and takes full responsibility for the content of the publication.
+
+%%=====================================================%%
+\begin{appendices}
+
+\section{Proxy indicator definitions}\label{app:indicators}
+
+Table~\ref{tab:defs} lists the two proxy indicators used in each study and their robustness
+counterparts. In Study~1 the ratios are items of the 64-ratio set of \citet{zieba2016}; in Study~2 they
+are items of the 25-ratio set in the rating data.
+
+\begin{table}[h]
+\centering
+\caption{Proxy and alternative indicators.}
+\label{tab:defs}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Role & Study 1 (Polish) & Study 2 (ratings) \\
+\midrule
+Profitability (main) & net profit / total assets & return on assets \\
+Leverage (main)      & total liabilities / total assets & debt ratio \\
+Liquidity (alt.)     & current assets / short-term liabilities & current ratio \\
+Activity (alt.)      & sales / total assets & asset turnover \\
+\botrule
+\end{tabular}
+\end{table}
+
+\section{$L_2$-penalized proportional-odds model}\label{app:po}
+
+To benchmark the full rating model without the non-convergence of a high-dimensional
+maximum-likelihood ordered logit, we estimate a cumulative-logit (proportional-odds) model with an
+$L_2$ penalty on the slope coefficients. For $K$ ordered grades the cumulative probabilities are
+\begin{equation}
+\Pr(R_i \le k) = \Lambda(\tau_k - \boldsymbol{\beta}^{\top}Z_i), \qquad k = 1,\dots,K-1,
+\end{equation}
+with $\Lambda$ the logistic function and ordered cutpoints $\tau_1 < \cdots < \tau_{K-1}$ enforced by a
+cumulative-exponential parameterization. The penalized negative log-likelihood is
+\begin{equation}
+\ell_{\lambda}(\boldsymbol{\beta},\boldsymbol{\tau}) = -\sum_{i} \log\Pr(R_i = r_i) + \lambda\,\lVert\boldsymbol{\beta}\rVert_2^2,
+\end{equation}
+minimized by L-BFGS with $\lambda=2$. This specification converges with the full 25-ratio set plus
+agency and sector fixed effects and yields a full-model QWK of 0.40 against 0.13 for the two-indicator
+model, with band-wise information loss of 4.2 percentage points in the middle band and 8.3 at the
+extremes---the same asymmetry found with the random forest and the maximum-likelihood ordered logit
+(Section~\ref{sec:robustness}). To validate the implementation, we compare it on the two-indicator case
+(where a standard maximum-likelihood ordered logit converges) against the \texttt{statsmodels}
+\texttt{OrderedModel}: the slope coefficients agree to within $10^{-4}$ (debt ratio $0.473$ vs $0.473$;
+return on assets $-0.612$ vs $-0.612$), with identical signs and ordering.
+
+\section{Additional tables}\label{app:tables}
+
+Table~\ref{tab:gradient} reports the out-of-fold AUC of the base-grade and augmented models by
+forecast horizon (Study~1). The incremental gain is retained as the horizon shortens, and is largest at
+the one-year-ahead horizon, consistent with an interim signal being more valuable closer to default.
+
+\begin{table}[h]
+\centering
+\caption{Study 1: out-of-fold AUC by forecast horizon.}
+\label{tab:gradient}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Horizon & $M_0$ (base) & $M_1$ ($+$2-proxy) & Gain \\
+\midrule
+1 (5-year) & 0.718 & 0.727 & 0.009 \\
+2          & 0.662 & 0.669 & 0.007 \\
+3          & 0.718 & 0.729 & 0.011 \\
+4          & 0.730 & 0.740 & 0.010 \\
+5 (1-year) & 0.810 & 0.822 & 0.011 \\
+\botrule
+\end{tabular}
+\end{table}
+
+\end{appendices}
+
+%%=====================================================%%
+\bibliography{references}
+
+\end{document}

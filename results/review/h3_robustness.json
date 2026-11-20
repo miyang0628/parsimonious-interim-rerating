@@ -1,0 +1,52 @@
+{
+  "baseline_logit_discretized_solvency": {
+    "link": "logit",
+    "gamma_plus": 2.813,
+    "z_plus": 7.74,
+    "gamma_minus": 1.218,
+    "z_minus": 1.49,
+    "ratio_absgp_absgm": 2.31,
+    "asymmetry_null_gp_minus_gm_eq0_p": 0.109,
+    "asymmetry_established": false
+  },
+  "a_probit_link": {
+    "link": "probit",
+    "gamma_plus": 1.748,
+    "z_plus": 8.69,
+    "gamma_minus": 0.189,
+    "z_minus": 0.48,
+    "ratio_absgp_absgm": 9.27,
+    "asymmetry_null_gp_minus_gm_eq0_p": 0.0016,
+    "asymmetry_established": true
+  },
+  "b_continuous_base_PD": {
+    "link": "logit",
+    "gamma_plus": 0.878,
+    "z_plus": 1.59,
+    "gamma_minus": -2.082,
+    "z_minus": -2.6,
+    "ratio_absgp_absgm": 0.42,
+    "asymmetry_null_gp_minus_gm_eq0_p": 0.00841,
+    "asymmetry_established": true
+  },
+  "c_placebo_nonsolvency_pair": {
+    "link": "logit",
+    "gamma_plus": 2.232,
+    "z_plus": 0.7,
+    "gamma_minus": -4.86,
+    "z_minus": -1.73,
+    "ratio_absgp_absgm": 0.46,
+    "asymmetry_null_gp_minus_gm_eq0_p": 0.0963,
+    "asymmetry_established": false
+  },
+  "d_global_mean_deviation": {
+    "link": "logit",
+    "gamma_plus": 2.827,
+    "z_plus": 9.93,
+    "gamma_minus": -0.239,
+    "z_minus": -0.21,
+    "ratio_absgp_absgm": 11.83,
+    "asymmetry_null_gp_minus_gm_eq0_p": 0.0111,
+    "asymmetry_established": true
+  }
+}

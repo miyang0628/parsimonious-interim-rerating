@@ -1,0 +1,10 @@
+{
+  "pooled": {"n": 43405, "dAUC": 0.0098, "DeLong_z": 7.77, "p": "7.8e-15", "LR": 82.3},
+  "by_horizon": [
+    {"h": 1, "years_ahead": 5, "n": 7027, "dAUC": 0.0045, "z": 1.42, "p": 0.155, "sig": false},
+    {"h": 2, "years_ahead": 4, "n": 10173, "dAUC": -0.0006, "z": -0.58, "p": 0.563, "sig": false},
+    {"h": 3, "years_ahead": 3, "n": 10503, "dAUC": 0.0035, "z": 1.57, "p": 0.115, "sig": false},
+    {"h": 4, "years_ahead": 2, "n": 9792, "dAUC": 0.0094, "z": 4.24, "p": "2.2e-5", "sig": true},
+    {"h": 5, "years_ahead": 1, "n": 5910, "dAUC": 0.0136, "z": 4.66, "p": "3.1e-6", "sig": true}
+  ]
+}

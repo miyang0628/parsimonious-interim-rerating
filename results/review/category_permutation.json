@@ -1,0 +1,8 @@
+{
+  "note": "R5 concern verified: 'solvency beats liquidity' is NOT in the data.",
+  "mean_LR_original_labels": {"both_solvency": 40.1, "both_liqact": 42.9, "mixed": 37.1},
+  "permutation_test_solvency_vs_liqact": {"diff": -2.8, "p": 0.80, "significant": false},
+  "top5_all_contain_Attr3_a_working_capital_ratio": true,
+  "pure_leverage_pair_Attr17_Attr8_LR": 0.15,
+  "verdict": "The ordering is driven by informativeness of specific ratios (notably Attr3 = working capital/total assets), NOT by the solvency category. Claim must be 'informativeness, not count', dropping solvency framing."
+}

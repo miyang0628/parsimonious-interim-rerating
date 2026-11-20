@@ -1,0 +1,11 @@
+{
+  "note": "Reviewer 4 found the asymmetry Wald test used the wrong null. Corrected here.",
+  "gamma_plus": 2.813, "z_plus": 7.74,
+  "gamma_minus": 1.218, "z_minus": 1.49,
+  "WRONG_null_gp_plus_gm_eq_0_p": "2.79e-07 (restates H1, not asymmetry)",
+  "CORRECT_null_gp_minus_gm_eq_0_p": 0.109,
+  "correct_test_significant": false,
+  "spread_dplus_sd": 0.0517, "spread_dminus_sd": 0.0309,
+  "spread_ratio": 1.67,
+  "verdict": "Asymmetry NOT statistically established under the correct null; downside slope partly reflects larger spread of d+ (distributional confound)."
+}

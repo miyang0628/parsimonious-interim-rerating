@@ -1,0 +1,112 @@
+[
+  {
+    "dataset": "credit_risk(consumer)",
+    "n": 32581,
+    "event_rate": 0.2182,
+    "two_indicators": [
+      "loan_percent_income",
+      "person_income"
+    ],
+    "n_other_features": 5,
+    "AUC_base": 0.7128,
+    "AUC_overlay": 0.8049,
+    "dAUC": 0.0921,
+    "DeLong_z": 29.243,
+    "DeLong_p": 5.46e-188,
+    "LR_stat": 3952.44,
+    "LR_p": 0.0,
+    "gamma_S": 4.817,
+    "gamma_z": 58.21,
+    "placebo_LR_median": 184.96,
+    "placebo_LR_max": 245.32,
+    "solvency_vs_placebo_ratio": 21.4
+  },
+  {
+    "dataset": "gmsc(consumer)",
+    "n": 150000,
+    "event_rate": 0.0668,
+    "two_indicators": [
+      "DEBT_RATIO",
+      "INCOME"
+    ],
+    "n_other_features": 7,
+    "AUC_base": 0.7586,
+    "AUC_overlay": 0.7668,
+    "dAUC": 0.0082,
+    "DeLong_z": 11.771,
+    "DeLong_p": 5.51e-32,
+    "LR_stat": 477.09,
+    "LR_p": 9.19e-106,
+    "gamma_S": 6.788,
+    "gamma_z": 20.01,
+    "placebo_LR_median": 1590.95,
+    "placebo_LR_max": 3753.65,
+    "solvency_vs_placebo_ratio": 0.3
+  },
+  {
+    "dataset": "taiwan(card)",
+    "n": 30000,
+    "event_rate": 0.2212,
+    "two_indicators": [
+      "LIMIT_BAL",
+      "PAY_0"
+    ],
+    "n_other_features": 21,
+    "AUC_base": 0.6778,
+    "AUC_overlay": 0.7185,
+    "dAUC": 0.0407,
+    "DeLong_z": 13.817,
+    "DeLong_p": 2e-43,
+    "LR_stat": 1560.78,
+    "LR_p": 0.0,
+    "gamma_S": 4.472,
+    "gamma_z": 38.67,
+    "placebo_LR_median": 63.04,
+    "placebo_LR_max": 165.53,
+    "solvency_vs_placebo_ratio": 24.8
+  },
+  {
+    "dataset": "adult(non-credit control)",
+    "n": 48842,
+    "event_rate": 0.2393,
+    "two_indicators": [
+      "education-num",
+      "hours-per-week"
+    ],
+    "n_other_features": 4,
+    "AUC_base": 0.7371,
+    "AUC_overlay": 0.8255,
+    "dAUC": 0.0883,
+    "DeLong_z": 44.117,
+    "DeLong_p": 0.0,
+    "LR_stat": 6589.08,
+    "LR_p": 0.0,
+    "gamma_S": 4.556,
+    "gamma_z": 73.79,
+    "placebo_LR_median": 1402.05,
+    "placebo_LR_max": 1418.4,
+    "solvency_vs_placebo_ratio": 4.7
+  },
+  {
+    "dataset": "polish(1yr, single-horizon)",
+    "n": 7027,
+    "event_rate": 0.0386,
+    "two_indicators": [
+      "Attr1",
+      "Attr2"
+    ],
+    "n_other_features": 62,
+    "AUC_base": 0.7085,
+    "AUC_overlay": 0.713,
+    "dAUC": 0.0045,
+    "DeLong_z": 1.423,
+    "DeLong_p": 0.155,
+    "LR_stat": 7.82,
+    "LR_p": 0.00518,
+    "gamma_S": 2.155,
+    "gamma_z": 2.86,
+    "placebo_LR_median": 0.99,
+    "placebo_LR_max": 11.14,
+    "solvency_vs_placebo_ratio": 7.9
+  }
+]
