@@ -1,3 +1,0 @@
-model,AUC,AR_Gini,Brier
-M0 (base grade),0.7344,0.4688,0.0438
-M1 (+2-proxy),0.7382,0.4764,0.04362
